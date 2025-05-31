@@ -1,130 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Art and Artist in Sant Andreu</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-
-  <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art and Artist in Sant Andreu</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="map"></div>
+    <div id="map"></div>
+    <div id="controls">
+        <button id="center-me">Set in my position</button>
+        <button id="calc-route">Calculate Route</button>
+    </div>
 
-  <script>
-    const apiKey = '5b3ce3597851110001cf6248aa52c64845204e28bd91ed14412554ef'; // Reemplazá con tu clave de OpenRouteService
-
-    const puntos = [
-
-      { nombre: "01-Civic Center", lat: 41.43093094217223, lng: 2.1894056495250642 },
-      { nombre: "02-Andrea Motis exHouse", lat: 41.43000788809112, lng: 2.1899769600516614 },
-      { nombre: "03-Guardiola House", lat: 41.42989425576133, lng: 2.1885881882692146 },
-      { nombre: "04-Sant Pacià Church", lat: 41.4314641382275, lng: 2.187598158800894 },
-      { nombre: "05-Ignasi Iglesias's birthplace", lat: 41.43355481321356, lng: 2.1881294986625996 },
-      { nombre: "06-Mazantini House", lat: 41.43314427447056, lng: 2.184589058417669 },
-      { nombre: "07-Wine press Can Xandri", lat: 41.4382293447858, lng: 2.1852772836869505 },
-      { nombre: "08-Grau Street", lat: 41.438897491936146, lng: 2.187751135335977 },
-      { nombre: "09-Bloc House", lat: 41.441436892353565, lng: 2.1905613340709755 },
-      { nombre: "10-Ignasi Iglesias School", lat: 41.44144279876725, lng: 2.1909969873278685 },
-      { nombre: "11-Guinart Pharmacy", lat: 41.43714677330241, lng: 2.189756025362985 },
-      { nombre: "12-Vidal House", lat: 41.43534380450655, lng: 2.1894265941445776 },
-      { nombre: "13-Ignasi Iglesias Study Center", lat: 41.43436178022363, lng: 2.191501406762273 },
-      { nombre: "14-Dr Sant Ponç Street Poem", lat: 41.43183745221323, lng: 2.1918748846124774 },
-      { nombre: "15-The Bomb House", lat: 41.431948998288725, lng: 2.18923598122458 },
-      { nombre: "16-Civic Center", lat: 41.43093094217223, lng: 2.1894056495250642 },
-    ];
-
-    const map = L.map('map').setView([puntos[0].lat, puntos[0].lng], 16);
-
-    // Agregar mapa base de OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Agregar marcadores con popups
-    puntos.forEach(punto => {
-      L.marker([punto.lat, punto.lng])
-        .addTo(map)
-        .bindPopup(`<strong>${punto.nombre}</strong>`);
-    });
-
-    // Obtener la ruta desde ORS
-    const coords = puntos.map(p => [p.lng, p.lat]);
-
-    fetch("https://api.openrouteservice.org/v2/directions/foot-walking/geojson", {
-      method: "POST",
-      headers: {
-        "Authorization": apiKey,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        coordinates: coords,
-        instructions: false
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      const ruta = L.geoJSON(data, {
-        style: {
-          color: "blue",
-          weight: 4,
-          opacity: 0.8
-        }
-      }).addTo(map);
-      map.fitBounds(ruta.getBounds());
-    })
-    .catch(error => {
-      console.error("Error al obtener ruta:", error);
-    });
-
-    // Geolocalización en tiempo real
-    let marcadorUsuario;
-
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const pos = [lat, lng];
-
-          if (!marcadorUsuario) {
-            marcadorUsuario = L.marker(pos, {
-              icon: L.circleMarker(pos, {
-                radius: 7,
-                fillColor: "#007BFF",
-                color: "#fff",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 1
-              }).options
-            }).addTo(map).bindPopup("Tu ubicación actual").openPopup();
-          } else {
-            marcadorUsuario.setLatLng(pos);
-          }
-
-          // Centrar el mapa en la ubicación actual (opcional)
-          // map.setView(pos);
-        },
-        (error) => {
-          console.error("Error obteniendo tu ubicación:", error);
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 1000,
-          timeout: 5000
-        }
-      );
-    } else {
-      alert("Tu navegador no soporta geolocalización.");
-    }
-  </script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
